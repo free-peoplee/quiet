@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Quiet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f3ee;
+    --bg-elevated: #fbf9f5;
+    --ink: #1f1d1a;
+    --ink-soft: #5a5550;
+    --ink-faint: #a39d96;
+    --accent: #b04a2f;
+    --accent-soft: #d77a5d;
+    --rule: #e3ddd4;
+    --you-bg: #1f1d1a;
+    --you-fg: #f6f3ee;
+    --them-bg: #ffffff;
+    --them-fg: #1f1d1a;
+    --shadow: 0 1px 2px rgba(31, 29, 26, 0.04), 0 8px 24px rgba(31, 29, 26, 0.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1815;
+      --bg-elevated: #221f1c;
+      --ink: #f0ebe3;
+      --ink-soft: #b5ada3;
+      --ink-faint: #6e665e;
+      --accent: #e08465;
+      --accent-soft: #b04a2f;
+      --rule: #332f2a;
+      --you-bg: #f0ebe3;
+      --you-fg: #1a1815;
+      --them-bg: #2c2823;
+      --them-fg: #f0ebe3;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: 'Fraunces', Georgia, serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ============ LOGIN SCREEN ============ */
+  .login-screen {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: var(--bg);
+    padding: 24px;
+    z-index: 100;
+  }
+
+  .login-card {
+    width: 100%; max-width: 380px;
+    background: var(--bg-elevated);
+    padding: 40px 32px;
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--rule);
+  }
+
+  .brand {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .brand-mark {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 48px;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+    font-style: italic;
+  }
+
+  .brand-mark::after {
+    content: '.';
+    color: var(--accent);
+    font-style: normal;
+  }
+
+  .brand-tag {
+    margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+  }
+
+  .login-form {
+    display: flex; flex-direction: column;
+    gap: 16px;
+  }
+
+  .field {
+    display: flex; flex-direction: column;
+    gap: 6px;
+  }
+
+  .field-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+
+  .field-input {
+    width: 100%;
+    padding: 12px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .field-input:focus {
+    border-color: var(--accent);
+  }
+
+  .field-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    line-height: 1.4;
+  }
+
+  .btn {
+    margin-top: 8px;
+    padding: 14px 20px;
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 500;
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    letter-spacing: -0.01em;
+  }
+
+  .btn:hover { opacity: 0.85; }
+  .btn:active { opacity: 0.7; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .login-footer {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    line-height: 1.6;
+  }
+
+  .login-footer summary {
+    cursor: pointer;
+    color: var(--ink-soft);
+  }
+
+  .login-footer p {
+    margin-top: 8px;
+  }
+
+  /* ============ CHAT SCREEN ============ */
+  .chat-screen {
+    display: none;
+    height: 100%;
+    flex-direction: column;
+    background: var(--bg);
+  }
+
+  .chat-screen.visible {
+    display: flex;
+  }
+
+  .chat-header {
+    flex-shrink: 0;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg-elevated);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+
+  .header-id {
+    display: flex; flex-direction: column;
+    gap: 2px;
+  }
+
+  .header-name {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 500;
+    font-style: italic;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+
+  .header-name::after {
+    content: '.';
+    color: var(--accent);
+    font-style: normal;
+  }
+
+  .header-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-faint);
+  }
+
+  .header-status {
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--ink-faint);
+    transition: background 0.3s;
+  }
+
+  .status-dot.online { background: #4a9d6f; }
+  .status-dot.syncing { background: var(--accent); animation: pulse 1.5s infinite; }
+  .status-dot.error { background: #b04a2f; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .header-actions {
+    display: flex; gap: 8px;
+  }
+
+  .icon-btn {
+    width: 32px; height: 32px;
+    background: transparent;
+    color: var(--ink-soft);
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+
+  .icon-btn:hover { background: var(--rule); color: var(--ink); }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 20px;
+    display: flex; flex-direction: column; gap: 12px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .messages::-webkit-scrollbar { width: 6px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
+
+  .empty-state {
+    margin: auto;
+    text-align: center;
+    color: var(--ink-faint);
+    padding: 40px 20px;
+  }
+
+  .empty-state-mark {
+    font-family: 'Fraunces', serif;
+    font-size: 64px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--ink-faint);
+    margin-bottom: 16px;
+    line-height: 1;
+  }
+
+  .empty-state-title {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-style: italic;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+
+  .empty-state-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-faint);
+  }
+
+  .day-divider {
+    text-align: center;
+    margin: 12px 0 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+  }
+
+  .msg {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-size: 15px;
+    line-height: 1.45;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    animation: msgIn 0.25s ease-out;
+  }
+
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg.you {
+    align-self: flex-end;
+    background: var(--you-bg);
+    color: var(--you-fg);
+    border-bottom-right-radius: 1px;
+  }
+
+  .msg.them {
+    align-self: flex-start;
+    background: var(--them-bg);
+    color: var(--them-fg);
+    border-bottom-left-radius: 1px;
+    border: 1px solid var(--rule);
+  }
+
+  .msg-text { white-space: pre-wrap; }
+
+  .msg-meta {
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    opacity: 0.5;
+    letter-spacing: 0.05em;
+  }
+
+  .msg.them .msg-meta { color: var(--ink-faint); }
+
+  .composer {
+    flex-shrink: 0;
+    padding: 12px 16px;
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--rule);
+    display: flex; gap: 8px; align-items: flex-end;
+  }
+
+  .composer-input {
+    flex: 1;
+    padding: 10px 14px;
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    background: var(--bg);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    outline: none;
+    resize: none;
+    max-height: 120px;
+    min-height: 40px;
+    line-height: 1.4;
+    transition: border-color 0.15s;
+  }
+
+  .composer-input:focus { border-color: var(--accent); }
+
+  .send-btn {
+    flex-shrink: 0;
+    width: 40px; height: 40px;
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.15s;
+  }
+
+  .send-btn:hover { opacity: 0.85; }
+  .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* ============ MODAL ============ */
+  .modal {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 20px; z-index: 200;
+  }
+
+  .modal.visible { display: flex; }
+
+  .modal-card {
+    background: var(--bg-elevated);
+    width: 100%; max-width: 360px;
+    padding: 28px 24px;
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--rule);
+  }
+
+  .modal-title {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-style: italic;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .modal-body {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .modal-actions {
+    display: flex; gap: 8px; justify-content: flex-end;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--rule);
+    padding: 10px 16px;
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+
+  .btn-secondary:hover { color: var(--ink); border-color: var(--ink-soft); }
+
+  .err {
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    margin-top: 4px;
+    min-height: 16px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-mark">quiet</div>
+      <div class="brand-tag">end-to-end encrypted</div>
+    </div>
+
+    <form class="login-form" id="loginForm" autocomplete="off">
+      <div class="field">
+        <label class="field-label" for="ghToken">github token</label>
+        <input class="field-input" type="password" id="ghToken" placeholder="ghp_..." autocomplete="off" spellcheck="false">
+        <div class="field-hint">classic token, gist scope only</div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="gistId">gist id</label>
+        <input class="field-input" type="text" id="gistId" placeholder="abc123..." autocomplete="off" spellcheck="false">
+        <div class="field-hint">leave empty to create a new gist</div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="passphrase">shared passphrase</label>
+        <input class="field-input" type="password" id="passphrase" placeholder="long random string" autocomplete="off" spellcheck="false">
+        <div class="field-hint">you and her must enter the exact same value. minimum 12 characters</div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="displayName">your name</label>
+        <input class="field-input" type="text" id="displayName" placeholder="daniel" autocomplete="off" spellcheck="false" maxlength="20">
+      </div>
+
+      <div class="err" id="loginErr"></div>
+
+      <button type="submit" class="btn" id="loginBtn">enter</button>
+    </form>
+
+    <details class="login-footer">
+      <summary>how this works</summary>
+      <p>messages are encrypted in your browser before being sent to a private github gist. only people with the same passphrase can read them. github cannot read your messages. neither can anyone else.</p>
+      <p style="margin-top:8px;">first time setup: leave gist id empty, the app will create one. share the gist id (and passphrase, separately) with the other person.</p>
+    </details>
+  </div>
+</div>
+
+<!-- ============ CHAT ============ -->
+<div class="chat-screen" id="chatScreen">
+  <div class="chat-header">
+    <div class="header-id">
+      <div class="header-name">quiet</div>
+      <div class="header-meta" id="headerMeta">connecting...</div>
+    </div>
+    <div class="header-status">
+      <span class="status-dot" id="statusDot"></span>
+      <div class="header-actions">
+        <button class="icon-btn" id="copyGistBtn" title="copy gist id">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+        <button class="icon-btn" id="logoutBtn" title="leave">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="messages" id="messages">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-state-mark">.</div>
+      <div class="empty-state-title">no messages yet</div>
+      <div class="empty-state-sub">say something</div>
+    </div>
+  </div>
+
+  <div class="composer">
+    <textarea class="composer-input" id="composerInput" placeholder="write a message..." rows="1"></textarea>
+    <button class="send-btn" id="sendBtn" disabled>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ============ MODAL ============ -->
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <div class="modal-title" id="modalTitle">.</div>
+    <div class="modal-body" id="modalBody">.</div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="modalClose">ok</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ============ STATE ============
+const state = {
+  token: null,
+  gistId: null,
+  passphrase: null,
+  displayName: null,
+  cryptoKey: null,
+  messages: [],
+  pollInterval: null,
+  lastSyncTime: 0,
+  syncing: false
+};
+
+const POLL_INTERVAL_MS = 5000;
+const GIST_FILENAME = 'quiet-chat.json';
+
+// ============ ENCRYPTION ============
+async function deriveKey(passphrase) {
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', enc.encode(passphrase), 'PBKDF2', false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: enc.encode('quiet-v1-salt'), iterations: 100000, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+async function encrypt(plaintext, key) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    new TextEncoder().encode(plaintext)
+  );
+  return {
+    iv: btoa(String.fromCharCode(...iv)),
+    ct: btoa(String.fromCharCode(...new Uint8Array(ciphertext)))
+  };
+}
+
+async function decrypt(ivB64, ctB64, key) {
+  try {
+    const iv = Uint8Array.from(atob(ivB64), c => c.charCodeAt(0));
+    const ct = Uint8Array.from(atob(ctB64), c => c.charCodeAt(0));
+    const plaintext = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv }, key, ct
+    );
+    return new TextDecoder().decode(plaintext);
+  } catch (e) {
+    return null;
+  }
+}
+
+// ============ GITHUB GIST API ============
+async function ghFetch(path, opts = {}) {
+  const res = await fetch(`https://api.github.com${path}`, {
+    ...opts,
+    headers: {
+      'Authorization': `token ${state.token}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
+      ...(opts.headers || {})
+    }
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`github ${res.status}: ${txt.slice(0, 200)}`);
+  }
+  return res.json();
+}
+
+async function createGist() {
+  const data = await ghFetch('/gists', {
+    method: 'POST',
+    body: JSON.stringify({
+      description: 'quiet chat',
+      public: false,
+      files: { [GIST_FILENAME]: { content: '[]' } }
+    })
+  });
+  return data.id;
+}
+
+async function readGist() {
+  const data = await ghFetch(`/gists/${state.gistId}`);
+  const file = data.files[GIST_FILENAME];
+  if (!file) return [];
+  try {
+    return JSON.parse(file.content || '[]');
+  } catch (e) {
+    return [];
+  }
+}
+
+async function writeGist(messages) {
+  await ghFetch(`/gists/${state.gistId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      files: { [GIST_FILENAME]: { content: JSON.stringify(messages) } }
+    })
+  });
+}
+
+// ============ MESSAGE HANDLING ============
+async function loadMessages() {
+  if (state.syncing) return;
+  state.syncing = true;
+  setStatus('syncing');
+
+  try {
+    const raw = await readGist();
+    const decrypted = [];
+    for (const m of raw) {
+      const text = await decrypt(m.iv, m.ct, state.cryptoKey);
+      if (text !== null) {
+        decrypted.push({
+          id: m.id,
+          from: m.from,
+          text,
+          ts: m.ts
+        });
+      }
+    }
+    state.messages = decrypted;
+    renderMessages();
+    setStatus('online');
+    state.lastSyncTime = Date.now();
+  } catch (e) {
+    console.error(e);
+    setStatus('error');
+  } finally {
+    state.syncing = false;
+  }
+}
+
+async function sendMessage(text) {
+  if (!text.trim()) return;
+
+  const msg = {
+    id: crypto.randomUUID(),
+    from: state.displayName,
+    text: text.trim(),
+    ts: Date.now()
+  };
+
+  // Optimistic render
+  state.messages.push(msg);
+  renderMessages();
+
+  setStatus('syncing');
+  try {
+    // Re-read in case other side wrote in the meantime
+    const raw = await readGist();
+    const encMsg = await encrypt(msg.text, state.cryptoKey);
+    raw.push({
+      id: msg.id,
+      from: msg.from,
+      ts: msg.ts,
+      iv: encMsg.iv,
+      ct: encMsg.ct
+    });
+    await writeGist(raw);
+    setStatus('online');
+  } catch (e) {
+    console.error(e);
+    setStatus('error');
+    showModal('send failed', 'check your connection and try again. message saved locally.');
+  }
+}
+
+// ============ RENDERING ============
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+}
+
+function formatTime(ts) {
+  const d = new Date(ts);
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+
+function formatDay(ts) {
+  const d = new Date(ts);
+  const now = new Date();
+  const sameDay = d.toDateString() === now.toDateString();
+  if (sameDay) return 'today';
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (d.toDateString() === yesterday.toDateString()) return 'yesterday';
+  return d.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
+}
+
+function renderMessages() {
+  const container = document.getElementById('messages');
+  const empty = document.getElementById('emptyState');
+
+  if (state.messages.length === 0) {
+    empty.style.display = 'block';
+    container.querySelectorAll('.msg, .day-divider').forEach(n => n.remove());
+    return;
+  }
+
+  empty.style.display = 'none';
+  container.querySelectorAll('.msg, .day-divider').forEach(n => n.remove());
+
+  // Sort by ts ascending
+  const sorted = [...state.messages].sort((a, b) => a.ts - b.ts);
+
+  let lastDay = '';
+  for (const m of sorted) {
+    const day = formatDay(m.ts);
+    if (day !== lastDay) {
+      const div = document.createElement('div');
+      div.className = 'day-divider';
+      div.textContent = day;
+      container.appendChild(div);
+      lastDay = day;
+    }
+    const el = document.createElement('div');
+    el.className = 'msg ' + (m.from === state.displayName ? 'you' : 'them');
+    el.innerHTML = `
+      <div class="msg-text">${escapeHtml(m.text)}</div>
+      <div class="msg-meta">
+        <span>${escapeHtml(m.from || 'them')}</span>
+        <span>·</span>
+        <span>${formatTime(m.ts)}</span>
+      </div>
+    `;
+    container.appendChild(el);
+  }
+
+  // Scroll to bottom
+  requestAnimationFrame(() => {
+    container.scrollTop = container.scrollHeight;
+  });
+}
+
+function setStatus(s) {
+  const dot = document.getElementById('statusDot');
+  const meta = document.getElementById('headerMeta');
+  dot.className = 'status-dot ' + s;
+  if (s === 'online') meta.textContent = 'connected · encrypted';
+  else if (s === 'syncing') meta.textContent = 'syncing...';
+  else if (s === 'error') meta.textContent = 'connection error';
+  else meta.textContent = 'connecting...';
+}
+
+function showModal(title, body) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').textContent = body;
+  document.getElementById('modal').classList.add('visible');
+}
+
+// ============ LOGIN FLOW ============
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('loginErr');
+  errEl.textContent = '';
+
+  const token = document.getElementById('ghToken').value.trim();
+  let gistId = document.getElementById('gistId').value.trim();
+  const passphrase = document.getElementById('passphrase').value;
+  const displayName = document.getElementById('displayName').value.trim();
+
+  if (!token) { errEl.textContent = 'github token required'; return; }
+  if (!passphrase || passphrase.length < 12) { errEl.textContent = 'passphrase too short (min 12)'; return; }
+  if (!displayName) { errEl.textContent = 'name required'; return; }
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.textContent = 'connecting...';
+
+  try {
+    state.token = token;
+    state.passphrase = passphrase;
+    state.displayName = displayName;
+    state.cryptoKey = await deriveKey(passphrase);
+
+    if (!gistId) {
+      gistId = await createGist();
+      showModal('new chat created', 'gist id: ' + gistId + '\n\nshare this id (and passphrase, separately) with the other person. they enter both to join.');
+    }
+    state.gistId = gistId;
+
+    // Test fetch
+    await readGist();
+
+    // Save to sessionStorage so refresh keeps you in (NOT localStorage, security)
+    try {
+      sessionStorage.setItem('quiet-token', token);
+      sessionStorage.setItem('quiet-gist', gistId);
+      sessionStorage.setItem('quiet-pass', passphrase);
+      sessionStorage.setItem('quiet-name', displayName);
+    } catch (e) {}
+
+    // Show chat
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('chatScreen').classList.add('visible');
+
+    await loadMessages();
+    startPolling();
+
+  } catch (e) {
+    errEl.textContent = e.message.slice(0, 100);
+    btn.disabled = false;
+    btn.textContent = 'enter';
+  }
+});
+
+// ============ POLLING ============
+function startPolling() {
+  if (state.pollInterval) clearInterval(state.pollInterval);
+  state.pollInterval = setInterval(loadMessages, POLL_INTERVAL_MS);
+}
+
+// ============ COMPOSER ============
+const input = document.getElementById('composerInput');
+const sendBtn = document.getElementById('sendBtn');
+
+input.addEventListener('input', () => {
+  sendBtn.disabled = !input.value.trim();
+  // Auto-resize
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+});
+
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    if (input.value.trim()) {
+      doSend();
+    }
+  }
+});
+
+sendBtn.addEventListener('click', doSend);
+
+async function doSend() {
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  sendBtn.disabled = true;
+  await sendMessage(text);
+}
+
+// ============ HEADER ACTIONS ============
+document.getElementById('copyGistBtn').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(state.gistId);
+    showModal('copied', 'gist id copied to clipboard');
+  } catch (e) {
+    showModal('gist id', state.gistId);
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  if (state.pollInterval) clearInterval(state.pollInterval);
+  try {
+    sessionStorage.removeItem('quiet-token');
+    sessionStorage.removeItem('quiet-gist');
+    sessionStorage.removeItem('quiet-pass');
+    sessionStorage.removeItem('quiet-name');
+  } catch (e) {}
+  location.reload();
+});
+
+document.getElementById('modalClose').addEventListener('click', () => {
+  document.getElementById('modal').classList.remove('visible');
+});
+
+// ============ AUTO-LOGIN FROM SESSION ============
+(async function tryAutoLogin() {
+  try {
+    const token = sessionStorage.getItem('quiet-token');
+    const gistId = sessionStorage.getItem('quiet-gist');
+    const passphrase = sessionStorage.getItem('quiet-pass');
+    const displayName = sessionStorage.getItem('quiet-name');
+    if (token && gistId && passphrase && displayName) {
+      document.getElementById('ghToken').value = token;
+      document.getElementById('gistId').value = gistId;
+      document.getElementById('passphrase').value = passphrase;
+      document.getElementById('displayName').value = displayName;
+      document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
