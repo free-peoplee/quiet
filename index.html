@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Quiet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f3ee;
+    --bg-elevated: #fbf9f5;
+    --ink: #1f1d1a;
+    --ink-soft: #5a5550;
+    --ink-faint: #a39d96;
+    --accent: #b04a2f;
+    --accent-soft: #d77a5d;
+    --rule: #e3ddd4;
+    --you-bg: #1f1d1a;
+    --you-fg: #f6f3ee;
+    --them-bg: #ffffff;
+    --them-fg: #1f1d1a;
+    --shadow: 0 1px 2px rgba(31, 29, 26, 0.04), 0 8px 24px rgba(31, 29, 26, 0.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1815;
+      --bg-elevated: #221f1c;
+      --ink: #f0ebe3;
+      --ink-soft: #b5ada3;
+      --ink-faint: #6e665e;
+      --accent: #e08465;
+      --rule: #332f2a;
+      --you-bg: #f0ebe3;
+      --you-fg: #1a1815;
+      --them-bg: #2c2823;
+      --them-fg: #f0ebe3;
+      --shadow: 0 1px 2px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.3);
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: 'Fraunces', Georgia, serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 16px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .login-screen {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: var(--bg);
+    padding: 24px; z-index: 100;
+    overflow-y: auto;
+  }
+
+  .login-card {
+    width: 100%; max-width: 380px;
+    background: var(--bg-elevated);
+    padding: 40px 32px;
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--rule);
+  }
+
+  .brand { text-align: center; margin-bottom: 32px; }
+
+  .brand-mark {
+    font-family: 'Fraunces', serif;
+    font-weight: 300; font-size: 48px;
+    letter-spacing: -0.04em;
+    line-height: 1; color: var(--ink);
+    font-style: italic;
+  }
+
+  .brand-mark::after { content: '.'; color: var(--accent); font-style: normal; }
+
+  .brand-tag {
+    margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.2em; color: var(--ink-faint);
+  }
+
+  .login-form { display: flex; flex-direction: column; gap: 16px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+
+  .field-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.15em; color: var(--ink-soft);
+    font-weight: 500;
+  }
+
+  .field-input {
+    width: 100%; padding: 12px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    background: var(--bg); color: var(--ink);
+    border: 1px solid var(--rule);
+    border-radius: 2px; outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .field-input:focus { border-color: var(--accent); }
+
+  .field-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--ink-faint);
+    line-height: 1.4;
+  }
+
+  .btn {
+    margin-top: 8px; padding: 14px 20px;
+    font-family: 'Fraunces', serif;
+    font-size: 16px; font-weight: 500;
+    background: var(--ink); color: var(--bg);
+    border: none; border-radius: 2px;
+    cursor: pointer; transition: opacity 0.2s;
+    letter-spacing: -0.01em;
+  }
+
+  .btn:hover { opacity: 0.85; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .login-footer {
+    margin-top: 24px; padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--ink-faint);
+    line-height: 1.6;
+  }
+
+  .login-footer summary { cursor: pointer; color: var(--ink-soft); }
+  .login-footer p { margin-top: 8px; }
+
+  .chat-screen { display: none; height: 100%; flex-direction: column; background: var(--bg); }
+  .chat-screen.visible { display: flex; }
+
+  .chat-header {
+    flex-shrink: 0; padding: 14px 20px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg-elevated);
+    display: flex; align-items: center;
+    justify-content: space-between; gap: 12px;
+  }
+
+  .header-id { display: flex; flex-direction: column; gap: 2px; }
+
+  .header-name {
+    font-family: 'Fraunces', serif;
+    font-size: 18px; font-weight: 500;
+    font-style: italic; letter-spacing: -0.01em;
+    line-height: 1;
+  }
+
+  .header-name::after { content: '.'; color: var(--accent); font-style: normal; }
+
+  .header-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.15em; color: var(--ink-faint);
+  }
+
+  .header-status { display: flex; align-items: center; gap: 6px; }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--ink-faint);
+    transition: background 0.3s;
+  }
+
+  .status-dot.online { background: #4a9d6f; }
+  .status-dot.syncing { background: var(--accent); animation: pulse 1.5s infinite; }
+  .status-dot.error { background: #b04a2f; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .header-actions { display: flex; gap: 8px; }
+
+  .icon-btn {
+    width: 32px; height: 32px;
+    background: transparent; color: var(--ink-soft);
+    border: none; border-radius: 2px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+
+  .icon-btn:hover { background: var(--rule); color: var(--ink); }
+
+  .messages {
+    flex: 1; overflow-y: auto;
+    padding: 24px 20px;
+    display: flex; flex-direction: column; gap: 12px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .messages::-webkit-scrollbar { width: 6px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
+
+  .empty-state {
+    margin: auto; text-align: center;
+    color: var(--ink-faint); padding: 40px 20px;
+  }
+
+  .empty-state-mark {
+    font-family: 'Fraunces', serif;
+    font-size: 64px; font-weight: 300;
+    font-style: italic; color: var(--ink-faint);
+    margin-bottom: 16px; line-height: 1;
+  }
+
+  .empty-state-title {
+    font-family: 'Fraunces', serif;
+    font-size: 18px; font-style: italic;
+    color: var(--ink-soft); margin-bottom: 4px;
+  }
+
+  .empty-state-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.15em; color: var(--ink-faint);
+  }
+
+  .day-divider {
+    text-align: center; margin: 12px 0 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.2em; color: var(--ink-faint);
+  }
+
+  .msg {
+    max-width: 85%; padding: 10px 14px;
+    border-radius: 4px;
+    font-size: 15px; line-height: 1.45;
+    word-wrap: break-word; overflow-wrap: break-word;
+    animation: msgIn 0.25s ease-out;
+  }
+
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg.you {
+    align-self: flex-end;
+    background: var(--you-bg); color: var(--you-fg);
+    border-bottom-right-radius: 1px;
+  }
+
+  .msg.them {
+    align-self: flex-start;
+    background: var(--them-bg); color: var(--them-fg);
+    border-bottom-left-radius: 1px;
+    border: 1px solid var(--rule);
+  }
+
+  .msg-text { white-space: pre-wrap; }
+
+  .mention {
+    display: inline-block;
+    padding: 0 6px;
+    border-radius: 3px;
+    background: rgba(176, 74, 47, 0.15);
+    color: var(--accent);
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.2;
+  }
+
+  .msg.you .mention {
+    background: rgba(246, 243, 238, 0.18);
+    color: var(--you-fg);
+  }
+
+  .mention.self {
+    background: var(--accent);
+    color: white;
+  }
+
+  .msg.you .mention.self {
+    background: var(--accent);
+    color: white;
+  }
+
+  .msg-image {
+    display: block; max-width: 100%;
+    max-height: 320px; border-radius: 2px;
+    margin: 0; cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .msg-image:hover { opacity: 0.92; }
+
+  .msg-voice {
+    display: flex; align-items: center; gap: 10px;
+    min-width: 220px;
+  }
+
+  .voice-play {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--accent); color: white;
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: opacity 0.15s;
+  }
+
+  .voice-play:hover { opacity: 0.85; }
+  .msg.you .voice-play { background: var(--you-fg); color: var(--you-bg); }
+
+  .voice-bars {
+    display: flex; align-items: center; gap: 2px;
+    flex: 1; height: 24px;
+  }
+
+  .voice-bar {
+    width: 2px; background: currentColor;
+    border-radius: 1px; opacity: 0.4;
+  }
+
+  .voice-bar.active { opacity: 1; }
+
+  .voice-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; opacity: 0.7;
+    min-width: 32px; text-align: right;
+  }
+
+  .msg-meta {
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; opacity: 0.5;
+    letter-spacing: 0.05em;
+  }
+
+  .msg.them .msg-meta { color: var(--ink-faint); }
+
+  .composer {
+    flex-shrink: 0; padding: 12px 16px;
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--rule);
+    display: flex; gap: 8px; align-items: flex-end;
+  }
+
+  .composer-input {
+    flex: 1; padding: 10px 14px;
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    background: var(--bg); color: var(--ink);
+    border: 1px solid var(--rule);
+    border-radius: 2px; outline: none;
+    resize: none;
+    max-height: 120px; min-height: 40px;
+    line-height: 1.4;
+    transition: border-color 0.15s;
+  }
+
+  .composer-input:focus { border-color: var(--accent); }
+
+  .attach-btn, .voice-btn, .send-btn {
+    flex-shrink: 0;
+    width: 40px; height: 40px;
+    border: none; border-radius: 2px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.15s, background 0.15s;
+  }
+
+  .attach-btn, .voice-btn {
+    background: transparent; color: var(--ink-soft);
+    border: 1px solid var(--rule);
+  }
+
+  .attach-btn:hover, .voice-btn:hover {
+    color: var(--ink); border-color: var(--ink-soft);
+  }
+
+  .voice-btn.recording {
+    background: var(--accent); color: white;
+    border-color: var(--accent);
+    animation: pulse 1s infinite;
+  }
+
+  .send-btn { background: var(--ink); color: var(--bg); }
+  .send-btn:hover { opacity: 0.85; }
+  .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .recording-bar {
+    flex: 1;
+    display: flex; align-items: center; gap: 12px;
+    padding: 0 14px; height: 40px;
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+
+  .rec-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1s infinite;
+  }
+
+  .rec-time { color: var(--ink); font-weight: 500; }
+
+  .rec-hint {
+    color: var(--ink-faint); font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.15em;
+    margin-left: auto;
+  }
+
+  .modal {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 20px; z-index: 200;
+  }
+
+  .modal.visible { display: flex; }
+
+  .modal-card {
+    background: var(--bg-elevated);
+    width: 100%; max-width: 360px;
+    padding: 28px 24px;
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--rule);
+  }
+
+  .modal-title {
+    font-family: 'Fraunces', serif;
+    font-size: 20px; font-style: italic;
+    margin-bottom: 8px; letter-spacing: -0.01em;
+  }
+
+  .modal-body {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--ink-soft);
+    line-height: 1.6; margin-bottom: 20px;
+    white-space: pre-wrap; word-break: break-all;
+  }
+
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+  .btn-secondary {
+    background: transparent; color: var(--ink-soft);
+    border: 1px solid var(--rule);
+    padding: 10px 16px;
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    border-radius: 2px; cursor: pointer;
+  }
+
+  .btn-secondary:hover { color: var(--ink); border-color: var(--ink-soft); }
+
+  .err {
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; margin-top: 4px;
+    min-height: 16px;
+  }
+
+  .lightbox {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.95);
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 20px; z-index: 300;
+    cursor: zoom-out;
+  }
+
+  .lightbox.visible { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; }
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-mark">quiet</div>
+      <div class="brand-tag">end-to-end encrypted</div>
+    </div>
+
+    <form class="login-form" id="loginForm" autocomplete="off">
+      <div class="field">
+        <label class="field-label" for="ghToken">github token</label>
+        <input class="field-input" type="password" id="ghToken" placeholder="ghp_..." autocomplete="off" spellcheck="false">
+        <div class="field-hint">classic token, gist scope only</div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="gistId">gist id</label>
+        <input class="field-input" type="text" id="gistId" placeholder="abc123..." autocomplete="off" spellcheck="false">
+        <div class="field-hint">leave empty to create a new gist</div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="passphrase">shared passphrase</label>
+        <input class="field-input" type="password" id="passphrase" placeholder="long random string" autocomplete="off" spellcheck="false">
+        <div class="field-hint">you and her must enter the exact same value. minimum 12 characters</div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="displayName">your name</label>
+        <input class="field-input" type="text" id="displayName" placeholder="daniel" autocomplete="off" spellcheck="false" maxlength="20">
+      </div>
+
+      <div class="err" id="loginErr"></div>
+
+      <button type="submit" class="btn" id="loginBtn">enter</button>
+    </form>
+
+    <details class="login-footer">
+      <summary>how this works</summary>
+      <p>messages encrypted in your browser before being sent to a private github gist. only people with the same passphrase can read them.</p>
+      <p style="margin-top:8px;">supports text, photos, voice messages, and @mentions. notifications when new messages arrive — louder when someone mentions you. messages older than 30 days auto-delete.</p>
+    </details>
+  </div>
+</div>
+
+<div class="chat-screen" id="chatScreen">
+  <div class="chat-header">
+    <div class="header-id">
+      <div class="header-name">quiet</div>
+      <div class="header-meta" id="headerMeta">connecting...</div>
+    </div>
+    <div class="header-status">
+      <span class="status-dot" id="statusDot"></span>
+      <div class="header-actions">
+        <button class="icon-btn" id="muteBtn" title="mute notifications" aria-label="toggle notifications">
+          <svg id="muteIconBell" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <svg id="muteIconOff" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M13.73 21a2 2 0 0 1-3.46 0"/><path d="M18.63 13A17.89 17.89 0 0 1 18 8"/><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"/><path d="M18 8a6 6 0 0 0-9.33-5"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        </button>
+        <button class="icon-btn" id="copyGistBtn" title="copy gist id">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+        <button class="icon-btn" id="logoutBtn" title="leave">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="messages" id="messages">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-state-mark">.</div>
+      <div class="empty-state-title">no messages yet</div>
+      <div class="empty-state-sub">say something</div>
+    </div>
+  </div>
+
+  <div class="composer" id="composer">
+    <button class="attach-btn" id="attachBtn" title="send photo">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    </button>
+    <input type="file" id="fileInput" accept="image/*" style="display:none">
+
+    <button class="voice-btn" id="voiceBtn" title="tap to record voice">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </button>
+
+    <textarea class="composer-input" id="composerInput" placeholder="write a message..." rows="1"></textarea>
+
+    <button class="send-btn" id="sendBtn" disabled>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <div class="modal-title" id="modalTitle">.</div>
+    <div class="modal-body" id="modalBody">.</div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="modalClose">ok</button>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <img id="lightboxImg" alt="">
+</div>
+
+<script>
+'use strict';
+
+const state = {
+  token: null, gistId: null, passphrase: null, displayName: null,
+  cryptoKey: null, messages: [], pollInterval: null, syncing: false,
+  recorder: null, recordingChunks: [], recordingStart: 0, recordingTimer: null,
+  seenIds: new Set(), unreadCount: 0, muted: false,
+  initialLoadDone: false, windowFocused: true
+};
+
+const POLL_INTERVAL_MS = 5000;
+const GIST_FILENAME = 'quiet-chat.json';
+const MAX_IMAGE_DIMENSION = 800;
+const IMAGE_JPEG_QUALITY = 0.7;
+const MAX_MESSAGE_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+
+async function deriveKey(passphrase) {
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', enc.encode(passphrase), 'PBKDF2', false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: enc.encode('quiet-v1-salt'), iterations: 100000, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false, ['encrypt', 'decrypt']
+  );
+}
+
+// Use chunked base64 encoding to avoid stack overflow on large buffers
+function bufToBase64(buf) {
+  const bytes = new Uint8Array(buf);
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
+
+function base64ToBuf(b64) {
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+async function encrypt(plaintext, key) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv }, key,
+    new TextEncoder().encode(plaintext)
+  );
+  return {
+    iv: bufToBase64(iv.buffer),
+    ct: bufToBase64(ciphertext)
+  };
+}
+
+async function decrypt(ivB64, ctB64, key) {
+  try {
+    const iv = base64ToBuf(ivB64);
+    const ct = base64ToBuf(ctB64);
+    const plaintext = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv }, key, ct
+    );
+    return new TextDecoder().decode(plaintext);
+  } catch (e) {
+    return null;
+  }
+}
+
+async function ghFetch(path, opts = {}) {
+  const res = await fetch(`https://api.github.com${path}`, {
+    ...opts,
+    headers: {
+      'Authorization': `token ${state.token}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
+      ...(opts.headers || {})
+    }
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`github ${res.status}: ${txt.slice(0, 200)}`);
+  }
+  return res.json();
+}
+
+async function createGist() {
+  const data = await ghFetch('/gists', {
+    method: 'POST',
+    body: JSON.stringify({
+      description: 'quiet chat',
+      public: false,
+      files: { [GIST_FILENAME]: { content: '[]' } }
+    })
+  });
+  return data.id;
+}
+
+async function readGist() {
+  const data = await ghFetch(`/gists/${state.gistId}`);
+  const file = data.files[GIST_FILENAME];
+  if (!file) return [];
+  let content = file.content || '[]';
+  if (file.truncated && file.raw_url) {
+    const rawRes = await fetch(file.raw_url);
+    content = await rawRes.text();
+  }
+  try { return JSON.parse(content); } catch (e) { return []; }
+}
+
+async function writeGist(messages) {
+  const cutoff = Date.now() - MAX_MESSAGE_AGE_MS;
+  const pruned = messages.filter(m => (m.ts || 0) >= cutoff);
+  await ghFetch(`/gists/${state.gistId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      files: { [GIST_FILENAME]: { content: JSON.stringify(pruned) } }
+    })
+  });
+  return pruned;
+}
+
+async function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > height && width > MAX_IMAGE_DIMENSION) {
+        height = Math.round(height * (MAX_IMAGE_DIMENSION / width));
+        width = MAX_IMAGE_DIMENSION;
+      } else if (height > MAX_IMAGE_DIMENSION) {
+        width = Math.round(width * (MAX_IMAGE_DIMENSION / height));
+        height = MAX_IMAGE_DIMENSION;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(blob => {
+        if (!blob) { reject(new Error('compression failed')); return; }
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      }, 'image/jpeg', IMAGE_JPEG_QUALITY);
+    };
+    img.onerror = () => reject(new Error('not a valid image'));
+    const reader = new FileReader();
+    reader.onload = () => { img.src = reader.result; };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function blobToDataURL(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+function formatDuration(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+// ============ NOTIFICATIONS ============
+let notifySound = null;
+
+function buildNotifySound() {
+  // Soft two-tone chime via WebAudio (no external file needed)
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return null;
+    return () => {
+      try {
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+        const tones = [
+          { f: 880, t: now,        d: 0.12, v: 0.15 },
+          { f: 1175, t: now + 0.13, d: 0.18, v: 0.12 }
+        ];
+        for (const tone of tones) {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = tone.f;
+          gain.gain.setValueAtTime(0, tone.t);
+          gain.gain.linearRampToValueAtTime(tone.v, tone.t + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, tone.t + tone.d);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(tone.t);
+          osc.stop(tone.t + tone.d + 0.02);
+        }
+        // Close context after sound finishes
+        setTimeout(() => { try { ctx.close(); } catch(e){} }, 600);
+      } catch (e) { console.warn('sound failed', e); }
+    };
+  } catch (e) { return null; }
+}
+
+function previewText(msg) {
+  if (msg.kind === 'image') return '📷 photo';
+  if (msg.kind === 'voice') return '🎤 voice message';
+  // Trim long text to ~60 chars
+  const t = String(msg.payload || '').replace(/\s+/g, ' ').trim();
+  return t.length > 60 ? t.slice(0, 57) + '...' : t;
+}
+
+function playMentionSound() {
+  // Three-tone, slightly louder, more distinct than normal chime
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+    const tones = [
+      { f: 1175, t: now,        d: 0.10, v: 0.20 },
+      { f: 1480, t: now + 0.11, d: 0.10, v: 0.20 },
+      { f: 1760, t: now + 0.22, d: 0.18, v: 0.18 }
+    ];
+    for (const tone of tones) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = tone.f;
+      gain.gain.setValueAtTime(0, tone.t);
+      gain.gain.linearRampToValueAtTime(tone.v, tone.t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, tone.t + tone.d);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(tone.t);
+      osc.stop(tone.t + tone.d + 0.02);
+    }
+    setTimeout(() => { try { ctx.close(); } catch(e){} }, 800);
+  } catch (e) {}
+}
+
+function notifyNew(latestMsg, count, mentioned) {
+  if (state.muted) {
+    // Even when muted, still update unread badge in title
+    if (!state.windowFocused) {
+      state.unreadCount += count;
+      updateTitleBadge(mentioned);
+    }
+    return;
+  }
+
+  // Sound: louder for mentions, normal otherwise
+  if (mentioned) {
+    playMentionSound();
+  } else if (notifySound) {
+    notifySound();
+  }
+
+  if (!state.windowFocused) {
+    state.unreadCount += count;
+    updateTitleBadge(mentioned);
+  }
+
+  // Desktop OS notification (only when window not focused, OR always for mentions)
+  const shouldDesktopNotify = (!state.windowFocused || mentioned)
+    && 'Notification' in window
+    && Notification.permission === 'granted';
+
+  if (shouldDesktopNotify) {
+    try {
+      let title;
+      if (mentioned) {
+        title = `${latestMsg.from} mentioned you`;
+      } else if (count > 1) {
+        title = `${latestMsg.from} · ${count} new messages`;
+      } else {
+        title = latestMsg.from;
+      }
+      const body = previewText(latestMsg);
+      const n = new Notification(title, {
+        body,
+        tag: 'quiet-chat',
+        silent: true,
+        requireInteraction: mentioned // mentions stick around longer
+      });
+      n.onclick = () => {
+        window.focus();
+        n.close();
+      };
+      setTimeout(() => { try { n.close(); } catch(e){} }, mentioned ? 12000 : 6000);
+    } catch (e) { console.warn('notification failed', e); }
+  }
+}
+
+function updateTitleBadge(mentioned) {
+  if (state.unreadCount > 0) {
+    const prefix = mentioned ? '@ ' : '';
+    document.title = `${prefix}(${state.unreadCount}) Quiet`;
+  } else {
+    document.title = 'Quiet';
+  }
+}
+
+function clearUnread() {
+  state.unreadCount = 0;
+  updateTitleBadge();
+}
+
+async function requestNotificationPermission() {
+  if (!('Notification' in window)) return 'unsupported';
+  if (Notification.permission === 'granted') return 'granted';
+  if (Notification.permission === 'denied') return 'denied';
+  try {
+    const result = await Notification.requestPermission();
+    return result;
+  } catch (e) {
+    return 'error';
+  }
+}
+
+// Track window focus to know when to badge/desktop-notify vs just sound
+window.addEventListener('focus', () => {
+  state.windowFocused = true;
+  clearUnread();
+});
+window.addEventListener('blur', () => {
+  state.windowFocused = false;
+});
+document.addEventListener('visibilitychange', () => {
+  state.windowFocused = !document.hidden;
+  if (state.windowFocused) clearUnread();
+});
+
+async function loadMessages() {
+  if (state.syncing) return;
+  state.syncing = true;
+  setStatus('syncing');
+
+  try {
+    const raw = await readGist();
+    const decrypted = [];
+    for (const m of raw) {
+      const text = await decrypt(m.iv, m.ct, state.cryptoKey);
+      if (text !== null) {
+        decrypted.push({
+          id: m.id, from: m.from, ts: m.ts,
+          kind: m.kind || 'text', payload: text,
+          meta: m.meta || {}
+        });
+      }
+    }
+
+    // Detect new messages from others (not on initial load)
+    if (state.initialLoadDone) {
+      const newFromOthers = decrypted.filter(m =>
+        m.from !== state.displayName && !state.seenIds.has(m.id)
+      );
+      if (newFromOthers.length > 0) {
+        // Pick the latest one for the notification preview
+        const latest = newFromOthers[newFromOthers.length - 1];
+        // Was self mentioned in any of the new text messages?
+        const mentioned = newFromOthers.some(m =>
+          m.kind === 'text' && isMentioned(m.payload, state.displayName)
+        );
+        notifyNew(latest, newFromOthers.length, mentioned);
+      }
+    }
+
+    // Update seen set with everything we've now loaded
+    for (const m of decrypted) state.seenIds.add(m.id);
+
+    state.messages = decrypted;
+    renderMessages();
+    setStatus('online');
+
+    if (!state.initialLoadDone) state.initialLoadDone = true;
+  } catch (e) {
+    console.error(e);
+    setStatus('error');
+  } finally {
+    state.syncing = false;
+  }
+}
+
+async function sendMessage(kind, payload, meta = {}) {
+  const msg = {
+    id: crypto.randomUUID(),
+    from: state.displayName,
+    ts: Date.now(),
+    kind, payload, meta
+  };
+
+  state.messages.push(msg);
+  renderMessages();
+  setStatus('syncing');
+
+  try {
+    const raw = await readGist();
+    const encMsg = await encrypt(msg.payload, state.cryptoKey);
+    raw.push({
+      id: msg.id, from: msg.from, ts: msg.ts,
+      kind: msg.kind, meta: msg.meta,
+      iv: encMsg.iv, ct: encMsg.ct
+    });
+    await writeGist(raw);
+    setStatus('online');
+  } catch (e) {
+    console.error(e);
+    setStatus('error');
+    showModal('send failed', e.message + '\n\ncheck your connection and try again.');
+    state.messages = state.messages.filter(m => m.id !== msg.id);
+    renderMessages();
+  }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+                  .replace(/'/g, '&#39;');
+}
+
+// ============ MENTIONS ============
+// Match @name where name is letters/digits/underscores/hyphens/dots, length 1-30.
+// Examples that match: @daniel, @albina, @anna_b, @john-doe, @j.smith
+// Won't match inside emails (foo@bar) because we require @ at start of token.
+const MENTION_RE = /(^|[\s(])@([a-zA-Z0-9_.\-]{1,30})/g;
+
+function extractMentions(text) {
+  const out = [];
+  if (!text) return out;
+  // reset lastIndex; using exec in loop
+  let m;
+  const re = new RegExp(MENTION_RE.source, 'g');
+  while ((m = re.exec(text)) !== null) {
+    out.push(m[2].toLowerCase());
+  }
+  return out;
+}
+
+function renderTextWithMentions(text, myName) {
+  // First escape html, then re-apply mention regex on the escaped string
+  const escaped = escapeHtml(text);
+  const myLower = (myName || '').toLowerCase();
+  const re = new RegExp(MENTION_RE.source, 'g');
+  return escaped.replace(re, (full, lead, name) => {
+    const isSelf = name.toLowerCase() === myLower;
+    return `${lead}<span class="mention${isSelf ? ' self' : ''}">@${escapeHtml(name)}</span>`;
+  });
+}
+
+function isMentioned(text, myName) {
+  if (!myName) return false;
+  const myLower = myName.toLowerCase();
+  return extractMentions(text).includes(myLower);
+}
+
+function formatTime(ts) {
+  return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+
+function formatDay(ts) {
+  const d = new Date(ts);
+  const now = new Date();
+  if (d.toDateString() === now.toDateString()) return 'today';
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (d.toDateString() === yesterday.toDateString()) return 'yesterday';
+  return d.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
+}
+
+function renderVoiceBars(activeRatio) {
+  const total = 24;
+  const active = Math.floor(total * activeRatio);
+  let html = '';
+  for (let i = 0; i < total; i++) {
+    const heightPct = 30 + ((i * 7) % 70);
+    html += `<span class="voice-bar ${i < active ? 'active' : ''}" style="height:${heightPct}%"></span>`;
+  }
+  return html;
+}
+
+function renderMessages() {
+  const container = document.getElementById('messages');
+  const empty = document.getElementById('emptyState');
+
+  if (state.messages.length === 0) {
+    empty.style.display = 'block';
+    container.querySelectorAll('.msg, .day-divider').forEach(n => n.remove());
+    return;
+  }
+
+  empty.style.display = 'none';
+  container.querySelectorAll('.msg, .day-divider').forEach(n => n.remove());
+
+  const sorted = [...state.messages].sort((a, b) => a.ts - b.ts);
+  let lastDay = '';
+
+  for (const m of sorted) {
+    const day = formatDay(m.ts);
+    if (day !== lastDay) {
+      const div = document.createElement('div');
+      div.className = 'day-divider';
+      div.textContent = day;
+      container.appendChild(div);
+      lastDay = day;
+    }
+    const el = document.createElement('div');
+    el.className = 'msg ' + (m.from === state.displayName ? 'you' : 'them');
+    el.dataset.id = m.id;
+
+    let bodyHtml = '';
+    if (m.kind === 'image') {
+      bodyHtml = `<img class="msg-image" src="${m.payload}" alt="image">`;
+    } else if (m.kind === 'voice') {
+      const dur = m.meta?.duration || 0;
+      bodyHtml = `
+        <div class="msg-voice" data-audio="${escapeHtml(m.payload)}" data-duration="${dur}">
+          <button class="voice-play">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+          </button>
+          <div class="voice-bars">${renderVoiceBars(0)}</div>
+          <span class="voice-time">${formatDuration(dur)}</span>
+        </div>
+      `;
+    } else {
+      bodyHtml = `<div class="msg-text">${renderTextWithMentions(m.payload, state.displayName)}</div>`;
+    }
+
+    el.innerHTML = bodyHtml + `
+      <div class="msg-meta">
+        <span>${escapeHtml(m.from || 'them')}</span>
+        <span>·</span>
+        <span>${formatTime(m.ts)}</span>
+      </div>
+    `;
+    container.appendChild(el);
+  }
+
+  container.querySelectorAll('.msg-image').forEach(img => {
+    img.addEventListener('click', () => openLightbox(img.src));
+  });
+
+  container.querySelectorAll('.voice-play').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const wrap = btn.closest('.msg-voice');
+      playVoice(wrap, btn);
+    });
+  });
+
+  requestAnimationFrame(() => {
+    container.scrollTop = container.scrollHeight;
+  });
+}
+
+function setStatus(s) {
+  const dot = document.getElementById('statusDot');
+  const meta = document.getElementById('headerMeta');
+  dot.className = 'status-dot ' + s;
+  if (s === 'online') meta.textContent = 'connected · encrypted';
+  else if (s === 'syncing') meta.textContent = 'syncing...';
+  else if (s === 'error') meta.textContent = 'connection error';
+  else meta.textContent = 'connecting...';
+}
+
+function showModal(title, body) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').textContent = body;
+  document.getElementById('modal').classList.add('visible');
+}
+
+function openLightbox(src) {
+  const lb = document.getElementById('lightbox');
+  document.getElementById('lightboxImg').src = src;
+  lb.classList.add('visible');
+}
+
+document.getElementById('lightbox').addEventListener('click', () => {
+  document.getElementById('lightbox').classList.remove('visible');
+});
+
+let currentAudio = null;
+let currentBtn = null;
+let progressInterval = null;
+
+function setPlayIcon(btn) {
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6 4 20 12 6 20 6 4"/></svg>`;
+}
+function setPauseIcon(btn) {
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
+}
+
+function playVoice(wrap, btn) {
+  if (currentAudio && currentBtn === btn) {
+    if (!currentAudio.paused) {
+      currentAudio.pause();
+      setPlayIcon(btn);
+    } else {
+      currentAudio.play();
+      setPauseIcon(btn);
+    }
+    return;
+  }
+  if (currentAudio) {
+    currentAudio.pause();
+    if (currentBtn) setPlayIcon(currentBtn);
+    if (progressInterval) clearInterval(progressInterval);
+  }
+  const src = wrap.dataset.audio;
+  currentAudio = new Audio(src);
+  currentBtn = btn;
+
+  currentAudio.play().then(() => {
+    setPauseIcon(btn);
+    progressInterval = setInterval(() => {
+      if (!currentAudio || !currentAudio.duration) return;
+      const ratio = currentAudio.currentTime / currentAudio.duration;
+      const barsEl = wrap.querySelector('.voice-bars');
+      if (barsEl) barsEl.innerHTML = renderVoiceBars(ratio);
+    }, 100);
+  }).catch(e => {
+    console.error('audio play failed', e);
+  });
+
+  currentAudio.addEventListener('ended', () => {
+    if (progressInterval) clearInterval(progressInterval);
+    setPlayIcon(btn);
+    const barsEl = wrap.querySelector('.voice-bars');
+    if (barsEl) barsEl.innerHTML = renderVoiceBars(0);
+  });
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('loginErr');
+  errEl.textContent = '';
+
+  const token = document.getElementById('ghToken').value.trim();
+  let gistId = document.getElementById('gistId').value.trim();
+  const passphrase = document.getElementById('passphrase').value;
+  const displayName = document.getElementById('displayName').value.trim();
+
+  if (!token) { errEl.textContent = 'github token required'; return; }
+  if (!passphrase || passphrase.length < 12) { errEl.textContent = 'passphrase too short (min 12)'; return; }
+  if (!displayName) { errEl.textContent = 'name required'; return; }
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.textContent = 'connecting...';
+
+  try {
+    state.token = token;
+    state.passphrase = passphrase;
+    state.displayName = displayName;
+    state.cryptoKey = await deriveKey(passphrase);
+
+    if (!gistId) {
+      gistId = await createGist();
+      showModal('new chat created', 'gist id: ' + gistId + '\n\nshare this id (and passphrase, separately) with the other person.');
+    }
+    state.gistId = gistId;
+
+    await readGist();
+
+    try {
+      sessionStorage.setItem('quiet-token', token);
+      sessionStorage.setItem('quiet-gist', gistId);
+      sessionStorage.setItem('quiet-pass', passphrase);
+      sessionStorage.setItem('quiet-name', displayName);
+    } catch (e) {}
+
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('chatScreen').classList.add('visible');
+
+    // Initialize notification system
+    notifySound = buildNotifySound();
+    // Restore mute preference
+    try {
+      state.muted = localStorage.getItem('quiet-muted') === '1';
+    } catch (e) {}
+    updateMuteIcon();
+    // Ask for desktop notification permission (non-blocking)
+    if (!state.muted) {
+      requestNotificationPermission().catch(() => {});
+    }
+
+    await loadMessages();
+    startPolling();
+
+  } catch (e) {
+    errEl.textContent = e.message.slice(0, 100);
+    btn.disabled = false;
+    btn.textContent = 'enter';
+  }
+});
+
+function startPolling() {
+  if (state.pollInterval) clearInterval(state.pollInterval);
+  state.pollInterval = setInterval(loadMessages, POLL_INTERVAL_MS);
+}
+
+const input = document.getElementById('composerInput');
+const sendBtn = document.getElementById('sendBtn');
+
+input.addEventListener('input', () => {
+  sendBtn.disabled = !input.value.trim();
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+});
+
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    if (input.value.trim()) doSend();
+  }
+});
+
+sendBtn.addEventListener('click', doSend);
+
+async function doSend() {
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  sendBtn.disabled = true;
+  clearUnread();
+  await sendMessage('text', text);
+}
+
+document.getElementById('attachBtn').addEventListener('click', () => {
+  document.getElementById('fileInput').click();
+});
+
+document.getElementById('fileInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  e.target.value = '';
+
+  if (!file.type.startsWith('image/')) {
+    showModal('not an image', 'please select an image file (jpg, png, webp)');
+    return;
+  }
+
+  setStatus('syncing');
+  try {
+    const dataUrl = await compressImage(file);
+    if (dataUrl.length > 800 * 1024) {
+      showModal('image too large', 'image too big even after compression. try a smaller photo.');
+      setStatus('online');
+      return;
+    }
+    await sendMessage('image', dataUrl);
+  } catch (err) {
+    console.error(err);
+    showModal('image error', err.message);
+    setStatus('online');
+  }
+});
+
+const voiceBtn = document.getElementById('voiceBtn');
+
+async function startRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+      ? 'audio/webm;codecs=opus'
+      : (MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm');
+    state.recorder = new MediaRecorder(stream, { mimeType, audioBitsPerSecond: 24000 });
+    state.recordingChunks = [];
+    state.recordingStart = Date.now();
+
+    state.recorder.ondataavailable = (e) => {
+      if (e.data.size > 0) state.recordingChunks.push(e.data);
+    };
+
+    state.recorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      const elapsed = (Date.now() - state.recordingStart) / 1000;
+      if (elapsed < 0.5) return;
+
+      const blob = new Blob(state.recordingChunks, { type: mimeType });
+
+      if (blob.size > 600 * 1024) {
+        showModal('recording too long', 'voice messages should be under ~60 seconds. please try again.');
+        return;
+      }
+
+      try {
+        const dataUrl = await blobToDataURL(blob);
+        await sendMessage('voice', dataUrl, { duration: elapsed });
+      } catch (e) {
+        console.error(e);
+        showModal('voice send failed', e.message);
+      }
+    };
+
+    state.recorder.start();
+    voiceBtn.classList.add('recording');
+    showRecordingBar();
+  } catch (e) {
+    console.error(e);
+    if (e.name === 'NotAllowedError') {
+      showModal('microphone blocked', 'please allow microphone access in your browser settings.');
+    } else {
+      showModal('cannot record', e.message);
+    }
+  }
+}
+
+function stopRecording() {
+  if (state.recordingTimer) {
+    clearInterval(state.recordingTimer);
+    state.recordingTimer = null;
+  }
+  hideRecordingBar();
+  voiceBtn.classList.remove('recording');
+  if (state.recorder && state.recorder.state !== 'inactive') {
+    state.recorder.stop();
+  }
+}
+
+function showRecordingBar() {
+  const composer = document.getElementById('composer');
+  if (composer.querySelector('.recording-bar')) return;
+
+  input.style.display = 'none';
+  document.getElementById('attachBtn').style.display = 'none';
+  sendBtn.style.display = 'none';
+
+  const bar = document.createElement('div');
+  bar.className = 'recording-bar';
+  bar.innerHTML = `
+    <span class="rec-dot"></span>
+    <span class="rec-time" id="recTime">0:00</span>
+    <span class="rec-hint">tap mic to stop</span>
+  `;
+  composer.insertBefore(bar, voiceBtn);
+
+  state.recordingTimer = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - state.recordingStart) / 1000);
+    const t = document.getElementById('recTime');
+    if (t) t.textContent = formatDuration(elapsed);
+    if (elapsed >= 60) stopRecording();
+  }, 200);
+}
+
+function hideRecordingBar() {
+  const composer = document.getElementById('composer');
+  const bar = composer.querySelector('.recording-bar');
+  if (bar) bar.remove();
+  input.style.display = '';
+  document.getElementById('attachBtn').style.display = '';
+  sendBtn.style.display = '';
+}
+
+voiceBtn.addEventListener('click', () => {
+  if (voiceBtn.classList.contains('recording')) {
+    stopRecording();
+  } else {
+    startRecording();
+  }
+});
+
+function updateMuteIcon() {
+  const bell = document.getElementById('muteIconBell');
+  const off = document.getElementById('muteIconOff');
+  const btn = document.getElementById('muteBtn');
+  if (!bell || !off || !btn) return;
+  if (state.muted) {
+    bell.style.display = 'none';
+    off.style.display = '';
+    btn.title = 'unmute notifications';
+  } else {
+    bell.style.display = '';
+    off.style.display = 'none';
+    btn.title = 'mute notifications';
+  }
+}
+
+document.getElementById('muteBtn').addEventListener('click', async () => {
+  state.muted = !state.muted;
+  try { localStorage.setItem('quiet-muted', state.muted ? '1' : '0'); } catch (e) {}
+  updateMuteIcon();
+
+  // If unmuting, prompt for permission and play a test sound
+  if (!state.muted) {
+    if (notifySound) notifySound();
+    if ('Notification' in window && Notification.permission === 'default') {
+      requestNotificationPermission().catch(() => {});
+    }
+  }
+});
+
+document.getElementById('copyGistBtn').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(state.gistId);
+    showModal('copied', 'gist id copied to clipboard');
+  } catch (e) {
+    showModal('gist id', state.gistId);
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  if (state.pollInterval) clearInterval(state.pollInterval);
+  document.title = 'Quiet';
+  try {
+    sessionStorage.removeItem('quiet-token');
+    sessionStorage.removeItem('quiet-gist');
+    sessionStorage.removeItem('quiet-pass');
+    sessionStorage.removeItem('quiet-name');
+  } catch (e) {}
+  location.reload();
+});
+
+document.getElementById('modalClose').addEventListener('click', () => {
+  document.getElementById('modal').classList.remove('visible');
+});
+
+(async function tryAutoLogin() {
+  try {
+    const token = sessionStorage.getItem('quiet-token');
+    const gistId = sessionStorage.getItem('quiet-gist');
+    const passphrase = sessionStorage.getItem('quiet-pass');
+    const displayName = sessionStorage.getItem('quiet-name');
+    if (token && gistId && passphrase && displayName) {
+      document.getElementById('ghToken').value = token;
+      document.getElementById('gistId').value = gistId;
+      document.getElementById('passphrase').value = passphrase;
+      document.getElementById('displayName').value = displayName;
+      document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
